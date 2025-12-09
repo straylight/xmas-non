@@ -1,0 +1,153 @@
+/* Mobile-first, cute Christmas theme */
+:root {
+  --bg: #0f172a; /* dark blue */
+  --fg: #e2e8f0; /* light text */
+  --accent: #e11d48; /* holly red */
+  --accent-2: #16a34a; /* evergreen */
+  --card: #1e293b; /* dark card */
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: 'Nunito', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+  color: var(--fg);
+  background: linear-gradient(180deg, var(--bg), #1e293b 60%);
+}
+
+.container {
+  min-height: 100vh;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.title {
+  margin: 0 0 4px 0;
+  font-size: clamp(1.6rem, 6vw, 2.4rem);
+  font-weight: 800;
+}
+.subtitle {
+  margin: 0 0 12px 0;
+  font-size: clamp(1rem, 4vw, 1.2rem);
+  opacity: 0.8;
+}
+.subtitle.hidden { display: none; }
+
+.btn {
+  appearance: none;
+  border: none;
+  background: linear-gradient(135deg, var(--accent), #fb7185);
+  color: white;
+  font-weight: 800;
+  padding: 14px 22px;
+  font-size: clamp(1rem, 4.5vw, 1.25rem);
+  border-radius: 999px;
+  box-shadow: 0 8px 24px rgba(225, 29, 72, 0.25);
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.btn:active { transform: translateY(1px) scale(0.99); }
+.btn:hover { box-shadow: 0 10px 28px rgba(225, 29, 72, 0.32); }
+.btn:focus { outline: 3px solid #fecdd3; outline-offset: 3px; }
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+  box-shadow: none;
+}
+
+.button-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-secondary {
+  appearance: none;
+  border: none;
+  background: linear-gradient(135deg, var(--accent-2), #34d399);
+  color: white;
+  font-weight: 800;
+  padding: 14px 22px;
+  font-size: clamp(1rem, 4.5vw, 1.25rem);
+  border-radius: 999px;
+  box-shadow: 0 8px 24px rgba(22, 163, 74, 0.25);
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.btn-secondary:active { transform: translateY(1px) scale(0.99); }
+.btn-secondary:hover { box-shadow: 0 10px 28px rgba(22, 163, 74, 0.32); }
+.btn-secondary:focus { outline: 3px solid #d1fae5; outline-offset: 3px; }
+
+.result {
+  margin-top: 8px;
+  max-width: 640px;
+  width: 100%;
+  background: #1e293b;
+  border: 2px solid #334155;
+  border-radius: 16px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+  padding: 16px;
+  font-size: clamp(1rem, 4vw, 1.15rem);
+  color: #e2e8f0;
+  position: relative;
+  z-index: 10;
+}
+
+.result.hidden { display: none; }
+
+.result .result-header {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid #334155;
+  border-radius: 12px 12px 0 0;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+.result-header.nice { color: #d1fae5; background: #065f46; border-bottom-color: #10b981; }
+.result-header.naughty { color: #fecaca; background: #7f1d1d; border-bottom-color: #f87171; }
+.result-content { padding-top: 8px; }
+.result .links { margin-top: 12px; font-size: 0.95em; }
+.result .links a { color: #60a5fa; text-decoration: none; font-weight: 700; }
+.result .links a:hover { color: #93c5fd; text-decoration: underline; }
+
+.footer { opacity: 0.9; margin-top: 12px; }
+.footer a { color: #60a5fa; text-decoration: none; font-weight: 700; }
+.footer a:hover { color: #93c5fd; text-decoration: underline; }
+
+/* Subtle snow animation */
+.snow {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(white 1.5px, transparent 1.5px);
+  background-size: 32px 32px;
+  opacity: 0.35;
+  animation: drift 12s linear infinite;
+}
+@keyframes drift { to { transform: translateY(16px); } }
+
+/* Snowflake animation for snowman mode */
+.snowflake {
+  position: fixed;
+  top: -20px;
+  color: #fff;
+  text-shadow: 0 0 8px rgba(255,255,255,0.8);
+  pointer-events: none;
+  z-index: 9999;
+  animation: fall linear forwards;
+}
+@keyframes fall {
+  to {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}

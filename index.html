@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Naughty or Nice?</title>
+    <meta name="description" content="A cute, minimal Christmas naughty-or-nice checker" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='24' font-size='24'%3E%F0%9F%8E%84%3C/text%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <main class="container" aria-live="polite">
+      <h1 class="title">Naughty or Nice?</h1>
+      <p class="subtitle">Tap the button to find out!</p>
+
+      <button id="checkBtn" class="btn" aria-label="Check if you're naughty or nice">Check 🎁</button>
+
+      <div id="result" class="result hidden" role="status"></div>
+
+      <footer class="footer">
+        <small class="links">Hope you're having fun at the holiday party!, <a href="https://www.linkedin.com/in/alan-placko" target="_blank" rel="noopener noreferrer">Find me on LinkedIn</a></small>
+      </footer>
+    </main>
+
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>
