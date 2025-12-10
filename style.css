@@ -80,6 +80,7 @@ body {
   box-shadow: 0 8px 24px rgba(22, 163, 74, 0.25);
   cursor: pointer;
   transition: transform 120ms ease, box-shadow 120ms ease;
+  touch-action: manipulation;
 }
 .btn-secondary:active { transform: translateY(1px) scale(0.99); }
 .btn-secondary:hover { box-shadow: 0 10px 28px rgba(22, 163, 74, 0.32); }
