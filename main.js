@@ -24,7 +24,6 @@ function getCookie(name) {
   return null;
 }
 
-// Cute, safe-for-work Christmas "crimes" (few dozen)
 const CHRISTMAS_CRIMES = [
   'Sneaking a peek at presents early',
   'Eating Santa\'s cookie before midnight',
@@ -38,6 +37,7 @@ const CHRISTMAS_CRIMES = [
   'Putting ornaments all on one branch',
   'Trying to guess every present out loud',
   'Taking the comfiest seat by the fireplace',
+  'Taking a software developer\'s fun sweater',
   'Snagging the best slice of pie',
   'Leaving glitter everywhere (festive chaos!)',
   'Claiming “taste test” on the frosting',
@@ -76,9 +76,9 @@ function renderNice() {
   document.querySelector('.subtitle')?.classList.add('hidden');
   result.classList.remove('hidden');
   result.innerHTML = `
-    <div class="result-header nice">Nice ✅</div>
+    <div class="result-header nice">You've been <i>nice!</i></div>
     <div class="result-content">
-      <p>Warm cocoa and cozy cheer—carry on, holiday hero! ✨</p>
+      <p>Warm cocoa and cozy cheer - carry on, holiday hero!</p>
     </div>
   `;
   // Replace button with spread joy (green)
@@ -141,9 +141,19 @@ function renderNaughtyLocked() {
     joyBtn.textContent = '⛄ Spread Joy';
     joyBtn.addEventListener('click', activateSnowmanMode);
     
-    btn.parentElement.insertBefore(buttonRow, btn);
-    buttonRow.appendChild(btn);
-    buttonRow.appendChild(joyBtn);
+    // Get the container (parent of btn, or parent of existing button-row)
+    const container = btn.closest('.container');
+    const existingRow = container.querySelector('.button-row');
+    
+    if (existingRow) {
+      // Button is already in a row, just add joy button if missing
+      existingRow.appendChild(joyBtn);
+    } else {
+      // Create new button row and move button into it
+      container.insertBefore(buttonRow, btn);
+      buttonRow.appendChild(btn);
+      buttonRow.appendChild(joyBtn);
+    }
   }
   
   // Persist state: permanently naughty
@@ -257,9 +267,9 @@ try {
       btn.textContent = '⛄ Spread Joy';
       result.classList.remove('hidden');
       result.innerHTML = `
-        <div class="result-header nice">Spreading Holiday Cheer! ❄️</div>
+        <div class="result-header nice">Spreading Holiday Cheer!</div>
         <div class="result-content">
-          <p>Keep clicking to make it snow! ⛄</p>
+          <p>Keep clicking to make it snow! ❄️</p>
         </div>
       `;
     } else if (wasNice) {

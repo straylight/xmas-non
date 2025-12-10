@@ -17,8 +17,21 @@
     <canvas id="snowCanvas" class="snow-canvas"></canvas>
     
     <main class="container" aria-live="polite">
-      <h1 class="title">Naughty or Nice?</h1>
-      <p class="subtitle">Tap the button to find out!</p>
+      
+      <div class="error-404">
+        <div class="terminal-header">
+          <span class="terminal-dot red"></span>
+          <span class="terminal-dot yellow"></span>
+          <span class="terminal-dot green"></span>
+          <span class="terminal-title">santa@northpole:~</span>
+        </div>
+        <div class="terminal-body">
+          <div class="terminal-line"><span class="prompt">$</span> find /closet -name "fun-sweater"</div>
+          <div class="terminal-line error">Error: FUN SWEATER NOT FOUND</div>
+          <div class="terminal-line"><span class="prompt">$</span> echo message.txt</div>
+          <div class="terminal-line">Anyway... Have you been naughty or nice? Tap the button to find out.</div>
+        </div>
+      </div>
 
       <button id="checkBtn" class="btn" aria-label="Check if you're naughty or nice">Check 🎁</button>
 
@@ -26,6 +39,7 @@
 
       <footer class="footer">
         <p class="footer-text">Hope you're having fun at the holiday party!</p>
+        <small class="footer-small">If you see my fun holiday sweater let me know</small>
         <a href="https://www.linkedin.com/in/alan-placko" target="_blank" rel="noopener noreferrer" class="linkedin-link">
           <svg class="linkedin-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
             <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>

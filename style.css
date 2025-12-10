@@ -29,6 +29,60 @@ body {
   z-index: 1;
 }
 
+/* 404 Error Banner - Festive Terminal */
+.error-404 {
+  background: linear-gradient(180deg, #1a0a0a 0%, #0d1117 100%);
+  border: 2px solid #2d5a27;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 24px;
+  font-family: 'Courier New', Courier, monospace;
+  text-align: left;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(22, 163, 74, 0.15),
+    inset 0 0 60px rgba(225, 29, 72, 0.05);
+  max-width: 500px;
+  width: 100%;
+}
+.terminal-header {
+  background: linear-gradient(90deg, #1e3a1e, #2d1a1a);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid #2d5a27;
+}
+.terminal-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+.terminal-dot.red { background: #e11d48; box-shadow: 0 0 8px #e11d48; }
+.terminal-dot.yellow { background: #fbbf24; box-shadow: 0 0 8px #fbbf24; }
+.terminal-dot.green { background: #16a34a; box-shadow: 0 0 8px #16a34a; }
+.terminal-title {
+  margin-left: auto;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+.terminal-body {
+  padding: 16px 20px;
+}
+.terminal-line {
+  font-size: clamp(0.9rem, 3.5vw, 1.1rem);
+  color: #e2e8f0;
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
+.terminal-line .prompt {
+  color: #16a34a;
+  margin-right: 8px;
+}
+.terminal-line.error {
+  color: #f87171;
+}
+
 .title {
   margin: 0 0 4px 0;
   font-size: clamp(1.6rem, 6vw, 2.4rem);
@@ -103,7 +157,7 @@ body {
   border-radius: 16px;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
   padding: 16px;
-  font-size: clamp(1rem, 4vw, 1.15rem);
+  font-size: clamp(0.9rem, 3.5vw, 1.1rem);
   color: #e2e8f0;
   position: relative;
   z-index: 10;
