@@ -25,6 +25,8 @@ body {
   justify-content: center;
   gap: 16px;
   text-align: center;
+  position: relative;
+  z-index: 1;
 }
 
 .title {
@@ -42,6 +44,7 @@ body {
 .btn {
   appearance: none;
   border: none;
+  background-color: #e11d48;
   background: linear-gradient(135deg, var(--accent), #fb7185);
   color: white;
   font-weight: 800;
@@ -51,13 +54,15 @@ body {
   box-shadow: 0 8px 24px rgba(225, 29, 72, 0.25);
   cursor: pointer;
   transition: transform 120ms ease, box-shadow 120ms ease;
+  position: relative;
+  z-index: 10;
 }
 .btn:active { transform: translateY(1px) scale(0.99); }
 .btn:hover { box-shadow: 0 10px 28px rgba(225, 29, 72, 0.32); }
 .btn:focus { outline: 3px solid #fecdd3; outline-offset: 3px; }
 .btn:disabled {
   cursor: not-allowed;
-  opacity: 0.7;
+  background: linear-gradient(135deg, #9f1239, #c4748a);
   box-shadow: none;
 }
 
@@ -71,6 +76,7 @@ body {
 .btn-secondary {
   appearance: none;
   border: none;
+  background-color: #16a34a;
   background: linear-gradient(135deg, var(--accent-2), #34d399);
   color: white;
   font-weight: 800;
@@ -81,6 +87,8 @@ body {
   cursor: pointer;
   transition: transform 120ms ease, box-shadow 120ms ease;
   touch-action: manipulation;
+  position: relative;
+  z-index: 10;
 }
 .btn-secondary:active { transform: translateY(1px) scale(0.99); }
 .btn-secondary:hover { box-shadow: 0 10px 28px rgba(22, 163, 74, 0.32); }
@@ -120,6 +128,21 @@ body {
 .result .links a { color: #60a5fa; text-decoration: none; font-weight: 700; }
 .result .links a:hover { color: #93c5fd; text-decoration: underline; }
 
+.crime-reason {
+  font-size: clamp(1.15rem, 4.5vw, 1.35rem);
+  font-weight: 700;
+  color: #fca5a5;
+  margin: 8px 0;
+  animation: wiggle 1s ease-in-out infinite;
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-1deg) translateY(0); }
+  25% { transform: rotate(0deg) translateY(-2px); }
+  50% { transform: rotate(1deg) translateY(0); }
+  75% { transform: rotate(0deg) translateY(2px); }
+}
+
 .footer {
   opacity: 0.9;
   margin-top: 24px;
@@ -142,13 +165,15 @@ body {
   font-weight: 700;
   font-size: clamp(1.1rem, 4vw, 1.4rem);
   padding: 12px 20px;
-  background: rgba(96, 165, 250, 0.1);
+  background: #1e3a5f;
   border-radius: 12px;
   transition: all 150ms ease;
+  position: relative;
+  z-index: 10;
 }
 .linkedin-link:hover {
   color: #93c5fd;
-  background: rgba(96, 165, 250, 0.2);
+  background: #264a73;
   transform: translateY(-2px);
 }
 .linkedin-icon {
@@ -156,17 +181,41 @@ body {
   height: 28px;
 }
 
-/* Subtle snow animation */
-.snow {
+/* Blurred background layer */
+.bg-blur {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(180deg, var(--bg), #1e293b 60%);
+  filter: blur(0px);
+  z-index: -2;
+}
+.bg-blur::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse at 20% 30%, rgba(225, 29, 72, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 70%, rgba(22, 163, 74, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(96, 165, 250, 0.08) 0%, transparent 60%);
+  filter: blur(60px);
+}
+
+/* Parallax snow layers */
+.snow-layer {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  background-image: radial-gradient(white 1.5px, transparent 1.5px);
-  background-size: 32px 32px;
-  opacity: 0.35;
-  animation: drift 12s linear infinite;
+  z-index: -1;
 }
-@keyframes drift { to { transform: translateY(16px); } }
+
+.snow-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+}
 
 /* Snowflake animation for snowman mode */
 .snowflake {

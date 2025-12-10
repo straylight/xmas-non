@@ -107,7 +107,8 @@ function renderNaughtyFirst() {
   result.innerHTML = `
     <div class="result-header naughty">Naughty ❄️</div>
     <div class="result-content">
-      <p>Uh oh! Holiday mischief detected: <strong>${crime}</strong>.</p>
+      <p>Uh oh! Holiday mischief detected:</p>
+      <p class="crime-reason">${crime}</p>
       <p>Tap again and we\'ll have to escalate... 🎄</p>
     </div>
   `;
@@ -121,7 +122,7 @@ function renderNaughtyLocked() {
   result.innerHTML = `
     <div class="result-header naughty">Super Naughty 🎅📜</div>
     <div class="result-content">
-      <p>You\'re officially on the permanent list. Coal-free, but noted!</p>
+      <p class="crime-reason">You\'re officially on the permanent list.</p>
       <p>Maybe try spreading some joy instead?</p>
     </div>
   `;
@@ -195,6 +196,7 @@ function handleClick() {
   // If nice and clicking again, enter snowman mode
   if (wasNice) {
     snowmanMode = true;
+    btn.className = 'btn-secondary';
     btn.textContent = '⛄ Spread Joy';
     result.innerHTML = `
       <div class="result-header nice">Spreading Holiday Cheer! ❄️</div>
@@ -251,6 +253,7 @@ try {
     } else if (wasNaughty) {
       renderNaughtyFirst();
     } else if (snowmanMode) {
+      btn.className = 'btn-secondary';
       btn.textContent = '⛄ Spread Joy';
       result.classList.remove('hidden');
       result.innerHTML = `
@@ -267,3 +270,118 @@ try {
 } catch (_) {
   // Ignore cookie parse errors
 }
+
+// ============================================
+// Interactive Snow Canvas with Wave Ripple Effect
+// ============================================
+(function() {
+  const canvas = document.getElementById('snowCanvas');
+  if (!canvas) return;
+  
+  const ctx = canvas.getContext('2d');
+  const gridSize = 32;
+  const baseRadius = 1.5;
+  const maxRadiusMultiplier = 3;
+  
+  // Ripples array: each ripple has { x, y, radius, maxRadius, speed }
+  const ripples = [];
+  
+  // Animation state
+  let baseOpacity = 0.3;
+  let opacityDirection = 1;
+  let driftOffsetY = 0;
+  let driftOffsetX = 0;
+  
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  
+  function addRipple(x, y) {
+    ripples.push({
+      x,
+      y,
+      radius: 0,
+      maxRadius: Math.max(canvas.width, canvas.height) * 0.6,
+      speed: 300
+    });
+  }
+  
+  function getSnowDotRadius(dotX, dotY) {
+    let radiusMultiplier = 1;
+    
+    for (const ripple of ripples) {
+      const dist = Math.sqrt((dotX - ripple.x) ** 2 + (dotY - ripple.y) ** 2);
+      const rippleWidth = 80;
+      const distFromRipple = Math.abs(dist - ripple.radius);
+      
+      if (distFromRipple < rippleWidth) {
+        // Wave shape: peaks at the ripple edge
+        const wave = 1 - (distFromRipple / rippleWidth);
+        const waveStrength = Math.sin(wave * Math.PI);
+        radiusMultiplier = Math.max(radiusMultiplier, 1 + (maxRadiusMultiplier - 1) * waveStrength);
+      }
+    }
+    
+    return baseRadius * radiusMultiplier;
+  }
+  
+  function draw(timestamp) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Update drift (vertical and horizontal movement)
+    driftOffsetY = (timestamp / 120) % gridSize;
+    driftOffsetX = (timestamp / 400) % gridSize;
+    
+    // Update opacity pulse
+    baseOpacity += opacityDirection * 0.0008;
+    if (baseOpacity >= 0.45) opacityDirection = -1;
+    if (baseOpacity <= 0.15) opacityDirection = 1;
+    
+    // Update ripples
+    for (let i = ripples.length - 1; i >= 0; i--) {
+      ripples[i].radius += ripples[i].speed * 0.016; // ~60fps
+      if (ripples[i].radius > ripples[i].maxRadius) {
+        ripples.splice(i, 1);
+      }
+    }
+    
+    // Draw snow dots
+    ctx.fillStyle = `rgba(255, 255, 255, ${baseOpacity})`;
+    
+    const cols = Math.ceil(canvas.width / gridSize) + 1;
+    const rows = Math.ceil(canvas.height / gridSize) + 2;
+    
+    for (let row = -1; row < rows; row++) {
+      for (let col = -1; col < cols + 1; col++) {
+        const x = col * gridSize + driftOffsetX;
+        const y = row * gridSize + driftOffsetY;
+        
+        const radius = getSnowDotRadius(x, y);
+        
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    
+    requestAnimationFrame(draw);
+  }
+  
+  // Event listeners for click/touch
+  document.addEventListener('click', (e) => {
+    addRipple(e.clientX, e.clientY);
+  });
+  
+  document.addEventListener('touchstart', (e) => {
+    for (const touch of e.touches) {
+      addRipple(touch.clientX, touch.clientY);
+    }
+  }, { passive: true });
+  
+  window.addEventListener('resize', resize);
+  
+  // Initialize
+  resize();
+  requestAnimationFrame(draw);
+})();
