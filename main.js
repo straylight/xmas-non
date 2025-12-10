@@ -121,7 +121,7 @@ function renderNaughtyLocked() {
   result.innerHTML = `
     <div class="result-header naughty">Super Naughty 🎅📜</div>
     <div class="result-content">
-      <p>You\'re officially on the permanent list. Coal-free, but noted! 😉</p>
+      <p>You\'re officially on the permanent list. Coal-free, but noted!</p>
       <p>Maybe try spreading some joy instead?</p>
     </div>
   `;

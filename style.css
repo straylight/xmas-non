@@ -119,9 +119,41 @@ body {
 .result .links a { color: #60a5fa; text-decoration: none; font-weight: 700; }
 .result .links a:hover { color: #93c5fd; text-decoration: underline; }
 
-.footer { opacity: 0.9; margin-top: 12px; }
-.footer a { color: #60a5fa; text-decoration: none; font-weight: 700; }
-.footer a:hover { color: #93c5fd; text-decoration: underline; }
+.footer {
+  opacity: 0.9;
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.footer-text {
+  margin: 0;
+  font-size: clamp(1rem, 3.5vw, 1.25rem);
+  font-weight: 600;
+}
+.linkedin-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #60a5fa;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: clamp(1.1rem, 4vw, 1.4rem);
+  padding: 12px 20px;
+  background: rgba(96, 165, 250, 0.1);
+  border-radius: 12px;
+  transition: all 150ms ease;
+}
+.linkedin-link:hover {
+  color: #93c5fd;
+  background: rgba(96, 165, 250, 0.2);
+  transform: translateY(-2px);
+}
+.linkedin-icon {
+  width: 28px;
+  height: 28px;
+}
 
 /* Subtle snow animation */
 .snow {
