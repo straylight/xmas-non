@@ -1,5 +1,12 @@
 const btn = document.getElementById('checkBtn');
 const terminalBody = document.getElementById('terminalBody');
+const footer = document.getElementById('footer');
+
+function showFooter() {
+  if (footer) {
+    footer.classList.remove('hidden');
+  }
+}
 
 // State: tracks if user has already been naughty once
 let wasNaughty = false;
@@ -135,6 +142,7 @@ async function renderNice() {
   addLine('');
   addPromptLine('_');
   
+  showFooter();
   replaceWithSpreadJoyButton();
 }
 
@@ -160,6 +168,7 @@ async function renderNaughtyFirst() {
   addLine('');
   addPromptLine('_');
   
+  showFooter();
   setCookie('xmas_state', JSON.stringify({ wasNaughty: true, lockedNaughty: false }));
 }
 
@@ -200,6 +209,7 @@ async function renderNaughtyLocked() {
     buttonRow.appendChild(joyBtn);
   }
   
+  showFooter();
   setCookie('xmas_state', JSON.stringify({ wasNaughty: true, lockedNaughty: true }));
 }
 
@@ -220,6 +230,7 @@ async function renderSpreadJoy() {
   addLine('');
   addPromptLine('_');
   
+  showFooter();
   for (let i = 0; i < 20; i++) {
     setTimeout(() => spawnSnowflake(), i * 40);
   }
@@ -327,6 +338,7 @@ try {
     wasNice = !!parsed.wasNice;
     snowmanMode = !!parsed.snowmanMode;
     
+    showFooter();
     if (lockedNaughty) {
       renderNaughtyLocked();
     } else if (wasNaughty) {

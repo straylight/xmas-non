@@ -226,6 +226,10 @@ body {
   gap: 12px;
   width: 100%;
   max-width: 500px;
+  transition: opacity 0.3s ease;
+}
+.footer.hidden {
+  display: none;
 }
 .footer-left {
   display: flex;
