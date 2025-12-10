@@ -1,11 +1,15 @@
 const btn = document.getElementById('checkBtn');
-const result = document.getElementById('result');
+const terminalBody = document.getElementById('terminalBody');
 
 // State: tracks if user has already been naughty once
 let wasNaughty = false;
-let lockedNaughty = false; // becomes true after second click post-naughty
-let wasNice = false; // becomes true after first nice result
-let snowmanMode = false; // becomes true after clicking while nice
+let lockedNaughty = false;
+let wasNice = false;
+let snowmanMode = false;
+let isAnimating = false;
+
+// NPM-style spinner frames
+const spinnerFrames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
 
 // Cookie helpers
 function setCookie(name, value, days = 30) {
@@ -14,6 +18,7 @@ function setCookie(name, value, days = 30) {
   const expires = `expires=${d.toUTCString()}`;
   document.cookie = `${name}=${encodeURIComponent(value)};${expires};path=/;SameSite=Lax`;
 }
+
 function getCookie(name) {
   const nameEQ = name + '=';
   const ca = document.cookie.split(';');
@@ -40,10 +45,10 @@ const CHRISTMAS_CRIMES = [
   'Taking a software developer\'s fun sweater',
   'Snagging the best slice of pie',
   'Leaving glitter everywhere (festive chaos!)',
-  'Claiming “taste test” on the frosting',
+  'Claiming "taste test" on the frosting',
   'Humming Jingle Bells on repeat',
   'Decorating the pet (with consent)',
-  'Saving the wrapping paper “for crafts later”',
+  'Saving the wrapping paper "for crafts later"',
   'Sneaking extra marshmallows in the cocoa',
   'Accidentally mixing up gift tags',
   'Turning the thermostat up for cozy vibes',
@@ -53,9 +58,9 @@ const CHRISTMAS_CRIMES = [
   'Photobombing the family picture',
   'Building a tiny snowman on the porch',
   'Practicing sleigh bell sound effects',
-  'Stretching “five more minutes” in bed',
+  'Stretching "five more minutes" in bed',
   'Borrowing Santa\'s hat for selfies',
-  'Rearranging ornaments for “aesthetic”',
+  'Rearranging ornaments for "aesthetic"',
   'Double-dipping the cookie in milk',
   'Saving the last cinnamon roll (strategically)',
   'Replacing fruitcake with brownies (allegedly)',
@@ -72,17 +77,159 @@ function pickRandom(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function renderNice() {
-  document.querySelector('.subtitle')?.classList.add('hidden');
-  result.classList.remove('hidden');
-  result.innerHTML = `
-    <div class="result-header nice">You've been <i>nice!</i></div>
-    <div class="result-content">
-      <p>Warm cocoa and cozy cheer - carry on, holiday hero!</p>
-    </div>
-  `;
-  // Replace button with spread joy (green)
+// Terminal helper functions
+function clearTerminal() {
+  terminalBody.innerHTML = '';
+}
+
+function addLine(text, className = '') {
+  const line = document.createElement('div');
+  line.className = 'terminal-line' + (className ? ' ' + className : '');
+  line.innerHTML = text;
+  terminalBody.appendChild(line);
+  return line;
+}
+
+function addPromptLine(command) {
+  return addLine(`<span class="prompt">$</span> ${command}`);
+}
+
+// Animated spinner that resolves after duration
+function showSpinner(text, duration = 1500) {
+  return new Promise(resolve => {
+    const line = addLine(`<span class="spinner">${spinnerFrames[0]}</span> ${text}`);
+    const spinnerEl = line.querySelector('.spinner');
+    let frame = 0;
+    
+    const interval = setInterval(() => {
+      frame = (frame + 1) % spinnerFrames.length;
+      spinnerEl.textContent = spinnerFrames[frame];
+    }, 80);
+    
+    setTimeout(() => {
+      clearInterval(interval);
+      resolve(line);
+    }, duration);
+  });
+}
+
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Render functions that output to terminal
+async function renderNice() {
+  clearTerminal();
+  addPromptLine('npx check-naughty-nice --user');
+  
+  const spinnerLine = await showSpinner('Checking Santa\'s list...', 1500);
+  spinnerLine.innerHTML = '<span class="success">✓</span> Check complete!';
+  
+  await delay(300);
+  addLine('');
+  addLine('========================================', 'success');
+  addLine('  Result: NICE', 'success');
+  addLine('========================================', 'success');
+  addLine('');
+  addLine('Warm cocoa and cozy cheer - carry on, holiday hero!');
+  addLine('');
+  addPromptLine('_');
+  
   replaceWithSpreadJoyButton();
+}
+
+async function renderNaughtyFirst() {
+  const crime = pickRandom(CHRISTMAS_CRIMES);
+  
+  clearTerminal();
+  addPromptLine('npx check-naughty-nice --user');
+  
+  const spinnerLine = await showSpinner('Checking Santa\'s list...', 1500);
+  spinnerLine.innerHTML = '<span class="error">✗</span> Uh oh...';
+  
+  await delay(300);
+  addLine('');
+  addLine('========================================', 'error');
+  addLine('  Result: NAUGHTY', 'error');
+  addLine('========================================', 'error');
+  addLine('');
+  addLine('Holiday mischief detected:', 'error');
+  addLine(`> ${crime}`, 'error');
+  addLine('');
+  addLine('Tap again and we\'ll have to escalate...');
+  addLine('');
+  addPromptLine('_');
+  
+  setCookie('xmas_state', JSON.stringify({ wasNaughty: true, lockedNaughty: false }));
+}
+
+async function renderNaughtyLocked() {
+  clearTerminal();
+  addPromptLine('npx check-naughty-nice --user --verify');
+  
+  const spinnerLine = await showSpinner('Double-checking records...', 1800);
+  spinnerLine.innerHTML = '<span class="error">✗</span> Confirmed!';
+  
+  await delay(300);
+  addLine('');
+  addLine('========================================', 'error');
+  addLine('  Result: SUPER NAUGHTY', 'error');
+  addLine('========================================', 'error');
+  addLine('');
+  addLine('You\'re officially on the permanent list.', 'error');
+  addLine('Maybe try spreading some joy instead?');
+  addLine('');
+  addPromptLine('_');
+  
+  btn.disabled = true;
+  btn.textContent = 'Locked';
+  btn.className = 'btn';
+  
+  if (!document.getElementById('joyBtn')) {
+    const buttonRow = document.createElement('div');
+    buttonRow.className = 'button-row';
+    const joyBtn = document.createElement('button');
+    joyBtn.id = 'joyBtn';
+    joyBtn.className = 'btn-secondary';
+    joyBtn.textContent = 'Spread Joy';
+    joyBtn.addEventListener('click', handleSpreadJoy);
+    
+    const container = btn.closest('.container');
+    container.insertBefore(buttonRow, btn);
+    buttonRow.appendChild(btn);
+    buttonRow.appendChild(joyBtn);
+  }
+  
+  setCookie('xmas_state', JSON.stringify({ wasNaughty: true, lockedNaughty: true }));
+}
+
+async function renderSpreadJoy() {
+  clearTerminal();
+  addPromptLine('npx spread-holiday-joy --snowflakes');
+  
+  const spinnerLine = await showSpinner('Generating snowflakes...', 1000);
+  spinnerLine.innerHTML = '<span class="success">✓</span> Joy activated!';
+  
+  await delay(200);
+  addLine('');
+  addLine('========================================', 'success');
+  addLine('  Spreading Holiday Cheer!', 'success');
+  addLine('========================================', 'success');
+  addLine('');
+  addLine('Keep clicking to make it snow!');
+  addLine('');
+  addPromptLine('_');
+  
+  for (let i = 0; i < 20; i++) {
+    setTimeout(() => spawnSnowflake(), i * 40);
+  }
+}
+
+function renderMoreSnow() {
+  // Just spawn more snowflakes without changing the terminal message
+  for (let i = 0; i < 25; i++) {
+    setTimeout(() => spawnSnowflake(), i * 30);
+  }
 }
 
 function spawnSnowflake() {
@@ -95,158 +242,80 @@ function spawnSnowflake() {
   flake.style.fontSize = (12 + Math.random() * 20) + 'px';
   flake.style.opacity = 0.6 + Math.random() * 0.4;
   document.body.appendChild(flake);
-  
-  // Remove after animation completes
   setTimeout(() => flake.remove(), 5500);
 }
 
-function renderNaughtyFirst() {
-  document.querySelector('.subtitle')?.classList.add('hidden');
-  const crime = pickRandom(CHRISTMAS_CRIMES);
-  result.classList.remove('hidden');
-  result.innerHTML = `
-    <div class="result-header naughty">Naughty ❄️</div>
-    <div class="result-content">
-      <p>Uh oh! Holiday mischief detected:</p>
-      <p class="crime-reason">${crime}</p>
-      <p>Tap again and we\'ll have to escalate... 🎄</p>
-    </div>
-  `;
-  // Persist state: naughty flagged
-  setCookie('xmas_state', JSON.stringify({ wasNaughty: true, lockedNaughty: false }));
-}
-
-function renderNaughtyLocked() {
-  document.querySelector('.subtitle')?.classList.add('hidden');
-  result.classList.remove('hidden');
-  result.innerHTML = `
-    <div class="result-header naughty">Super Naughty 🎅📜</div>
-    <div class="result-content">
-      <p class="crime-reason">You\'re officially on the permanent list.</p>
-      <p>Maybe try spreading some joy instead?</p>
-    </div>
-  `;
-  // Disable main button
-  btn.disabled = true;
-  btn.textContent = 'Locked 🔒';
-  btn.className = 'btn';
-  
-  // Add spread joy button next to it
-  if (!document.getElementById('joyBtn')) {
-    const buttonRow = document.createElement('div');
-    buttonRow.className = 'button-row';
-    const joyBtn = document.createElement('button');
-    joyBtn.id = 'joyBtn';
-    joyBtn.className = 'btn-secondary';
-    joyBtn.textContent = '⛄ Spread Joy';
-    joyBtn.addEventListener('click', activateSnowmanMode);
-    
-    // Get the container (parent of btn, or parent of existing button-row)
-    const container = btn.closest('.container');
-    const existingRow = container.querySelector('.button-row');
-    
-    if (existingRow) {
-      // Button is already in a row, just add joy button if missing
-      existingRow.appendChild(joyBtn);
-    } else {
-      // Create new button row and move button into it
-      container.insertBefore(buttonRow, btn);
-      buttonRow.appendChild(btn);
-      buttonRow.appendChild(joyBtn);
-    }
-  }
-  
-  // Persist state: permanently naughty
-  setCookie('xmas_state', JSON.stringify({ wasNaughty: true, lockedNaughty: true }));
-}
-
-function activateSnowmanMode() {
-  if (!snowmanMode) {
-    snowmanMode = true;
-    result.innerHTML = `
-      <div class="result-header nice">Spreading Holiday Cheer! ❄️</div>
-      <div class="result-content">
-        <p>Keep clicking to make it snow! ⛄</p>
-      </div>
-    `;
-    for (let i = 0; i < 20; i++) {
-      setTimeout(() => spawnSnowflake(), i * 40);
-    }
-  }
-  // Spawn snowflakes on each click
-  for (let i = 0; i < 25; i++) {
-    setTimeout(() => spawnSnowflake(), i * 30);
-  }
-}
-
 function replaceWithSpreadJoyButton() {
-  // Remove any existing button setup first
   const existingRow = document.querySelector('.button-row');
   if (existingRow) {
     btn.parentElement.insertBefore(btn, existingRow);
     existingRow.remove();
   }
   
-  // Replace the main button with spread joy
   btn.className = 'btn-secondary';
-  btn.textContent = '⛄ Spread Joy';
+  btn.textContent = 'Spread Joy';
   btn.disabled = false;
-  btn.onclick = activateSnowmanMode;
 }
 
-function handleClick() {
+async function handleSpreadJoy() {
+  if (isAnimating) return;
+  
+  if (!snowmanMode) {
+    isAnimating = true;
+    snowmanMode = true;
+    await renderSpreadJoy();
+    isAnimating = false;
+    setCookie('xmas_state', JSON.stringify({ wasNaughty, lockedNaughty, wasNice, snowmanMode: true }));
+  } else {
+    renderMoreSnow();
+  }
+}
+
+async function handleClick() {
+  if (isAnimating) return;
+  
   // Snowman mode: spawn snowflakes on every click
   if (snowmanMode) {
-    for (let i = 0; i < 25; i++) {
-      setTimeout(() => spawnSnowflake(), i * 30);
-    }
+    renderMoreSnow();
     return;
   }
   
   // If nice and clicking again, enter snowman mode
   if (wasNice) {
+    isAnimating = true;
     snowmanMode = true;
     btn.className = 'btn-secondary';
-    btn.textContent = '⛄ Spread Joy';
-    result.innerHTML = `
-      <div class="result-header nice">Spreading Holiday Cheer! ❄️</div>
-      <div class="result-content">
-        <p>Keep clicking to make it snow! ⛄</p>
-      </div>
-    `;
+    btn.textContent = 'Spread Joy';
+    await renderSpreadJoy();
+    isAnimating = false;
     setCookie('xmas_state', JSON.stringify({ wasNaughty: false, lockedNaughty: false, wasNice: true, snowmanMode: true }));
-    for (let i = 0; i < 20; i++) {
-      setTimeout(() => spawnSnowflake(), i * 40);
-    }
     return;
   }
   
   // If already flagged naughty once, second click locks it
   if (wasNaughty && !lockedNaughty) {
+    isAnimating = true;
     lockedNaughty = true;
-    renderNaughtyLocked();
+    await renderNaughtyLocked();
+    isAnimating = false;
     return;
   }
 
   // Otherwise decide randomly
-  const isNaughty = Math.random() < 0.5; // 50/50
+  isAnimating = true;
+  const isNaughty = Math.random() < 0.5;
   if (isNaughty) {
     wasNaughty = true;
-    renderNaughtyFirst();
+    await renderNaughtyFirst();
   } else {
     wasNice = true;
-    renderNice();
-    // Persist state: nice
+    await renderNice();
     setCookie('xmas_state', JSON.stringify({ wasNaughty: false, lockedNaughty: false, wasNice: true, snowmanMode: false }));
   }
+  isAnimating = false;
 }
 
 btn.addEventListener('click', handleClick);
-
-// Optional: subtle snow overlay
-const snow = document.createElement('div');
-snow.className = 'snow';
-document.body.appendChild(snow);
 
 // Restore state from cookie on load
 try {
@@ -264,16 +333,16 @@ try {
       renderNaughtyFirst();
     } else if (snowmanMode) {
       btn.className = 'btn-secondary';
-      btn.textContent = '⛄ Spread Joy';
-      result.classList.remove('hidden');
-      result.innerHTML = `
-        <div class="result-header nice">Spreading Holiday Cheer!</div>
-        <div class="result-content">
-          <p>Keep clicking to make it snow! ❄️</p>
-        </div>
-      `;
+      btn.textContent = 'Spread Joy';
+      clearTerminal();
+      addPromptLine('npx spread-holiday-joy --resume');
+      addLine('<span class="success">✓</span> Welcome back!');
+      addLine('');
+      addLine('Spreading Holiday Cheer!', 'success');
+      addLine('Keep clicking to make it snow!');
+      addLine('');
+      addPromptLine('_');
     } else if (wasNice) {
-      // Show nice state only if previously saved
       renderNice();
     }
   }
@@ -282,7 +351,7 @@ try {
 }
 
 // ============================================
-// Interactive Snow Canvas with Wave Ripple Effect
+// Snow Canvas Background
 // ============================================
 (function() {
   const canvas = document.getElementById('snowCanvas');
@@ -291,12 +360,7 @@ try {
   const ctx = canvas.getContext('2d');
   const gridSize = 32;
   const baseRadius = 1.5;
-  const maxRadiusMultiplier = 3;
   
-  // Ripples array: each ripple has { x, y, radius, maxRadius, speed }
-  const ripples = [];
-  
-  // Animation state
   let baseOpacity = 0.3;
   let opacityDirection = 1;
   let driftOffsetY = 0;
@@ -307,56 +371,16 @@ try {
     canvas.height = window.innerHeight;
   }
   
-  function addRipple(x, y) {
-    ripples.push({
-      x,
-      y,
-      radius: 0,
-      maxRadius: Math.max(canvas.width, canvas.height) * 0.6,
-      speed: 300
-    });
-  }
-  
-  function getSnowDotRadius(dotX, dotY) {
-    let radiusMultiplier = 1;
-    
-    for (const ripple of ripples) {
-      const dist = Math.sqrt((dotX - ripple.x) ** 2 + (dotY - ripple.y) ** 2);
-      const rippleWidth = 80;
-      const distFromRipple = Math.abs(dist - ripple.radius);
-      
-      if (distFromRipple < rippleWidth) {
-        // Wave shape: peaks at the ripple edge
-        const wave = 1 - (distFromRipple / rippleWidth);
-        const waveStrength = Math.sin(wave * Math.PI);
-        radiusMultiplier = Math.max(radiusMultiplier, 1 + (maxRadiusMultiplier - 1) * waveStrength);
-      }
-    }
-    
-    return baseRadius * radiusMultiplier;
-  }
-  
   function draw(timestamp) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Update drift (vertical and horizontal movement)
     driftOffsetY = (timestamp / 120) % gridSize;
     driftOffsetX = (timestamp / 400) % gridSize;
     
-    // Update opacity pulse
     baseOpacity += opacityDirection * 0.0008;
     if (baseOpacity >= 0.45) opacityDirection = -1;
     if (baseOpacity <= 0.15) opacityDirection = 1;
     
-    // Update ripples
-    for (let i = ripples.length - 1; i >= 0; i--) {
-      ripples[i].radius += ripples[i].speed * 0.016; // ~60fps
-      if (ripples[i].radius > ripples[i].maxRadius) {
-        ripples.splice(i, 1);
-      }
-    }
-    
-    // Draw snow dots
     ctx.fillStyle = `rgba(255, 255, 255, ${baseOpacity})`;
     
     const cols = Math.ceil(canvas.width / gridSize) + 1;
@@ -367,10 +391,8 @@ try {
         const x = col * gridSize + driftOffsetX;
         const y = row * gridSize + driftOffsetY;
         
-        const radius = getSnowDotRadius(x, y);
-        
         ctx.beginPath();
-        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.arc(x, y, baseRadius, 0, Math.PI * 2);
         ctx.fill();
       }
     }
@@ -378,20 +400,8 @@ try {
     requestAnimationFrame(draw);
   }
   
-  // Event listeners for click/touch
-  document.addEventListener('click', (e) => {
-    addRipple(e.clientX, e.clientY);
-  });
-  
-  document.addEventListener('touchstart', (e) => {
-    for (const touch of e.touches) {
-      addRipple(touch.clientX, touch.clientY);
-    }
-  }, { passive: true });
-  
   window.addEventListener('resize', resize);
   
-  // Initialize
   resize();
   requestAnimationFrame(draw);
 })();
